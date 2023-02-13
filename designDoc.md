@@ -20,26 +20,10 @@ Imports occur after this commented-out header and then the actual code.
 
 ## Docstrings
 
-Docstrings will be a prevelant part of the code, will be included with most functions and will follow the guidelines below. These "rules" can change depending on the complexity of a function (ie complex small functions will need more documentation, simple long functions will need less), but they are included as a general rule of thumb.
+Docstrings will be a prevelant part of the code, will be included with most functions and will follow the guidelines below.
 
-#### Small
-If the function is small (roughly 2-3 lines of code or less) and simple, no docstrings are needed. The name of the function should be enough to understand what is happening. This will be a rare case.
->Example: 
->    def add_two_Numbers(a: int, b: int):
->        answer = a + b
->        return answer
+For all functions we will use Google's docstring style. This includes having 1-2 sentences describing what the code does and also includes a section describing the arguments and a section describing the return values. If there are no argument/return values, there is no need to include those sections. You can optionally include a more detailed explanation after the initial description if you want to add more documentation. Triple double quotes will be used (as opposed to triple single quotes).
 
-#### Medium
-If the function is somewhere between 4-10 lines of code and is relatively simple, a single sentence for the docstring will likely suffice. If using this style, it should be clear what inputs and outputs do if they exist.
->Example:
->    def merge_two_dicts(x, y):
->        """Given two dictionaries, merge them into a new dict as a shallow copy."""
->        z = x.copy()
->        z.update(y)
->        return z
-
-#### Long
-If the function is long and complex, we will use Google's docstring style. This includes having 1-2 sentences describing what the code does and also includes a section describing the arguments and a scetion describing the return values.
 >Example: 
 >    def function_with_types_in_docstring(param1, param2):
 >        """
@@ -53,6 +37,20 @@ If the function is long and complex, we will use Google's docstring style. This 
 >            bool: The return value. True for success, False otherwise.
 >        """
 >        <code>
+
+>Example:
+>    def copy_mouse_position():
+>        """
+>        Copies the current mouse position on the screen to the console and your clipboard when the 'insert' key is pressed. 
+>        This position can be used in clicking functions that will click a particular area. 
+>        """
+>        print('Running copy_mouse_position.py. Press the \'insert\' key to copy mouse position.')
+>        print('Press ctrl + c while in the terminal window to exit.')
+>        while True:
+>            keyboard.wait('insert')
+>            x, y = pyautogui.position()
+>            pyperclip.copy(f'{str(x)}, {str(y)}')   
+>            print(f'\'Insert\' key was pressed! Copied mouse position ({str(x)}, {str(y)}) to clipboard. Press ctrl + c while in the terminal window to exit. Waiting again...')
 
 ## White Spacing
 Two empty lines above function declarations
