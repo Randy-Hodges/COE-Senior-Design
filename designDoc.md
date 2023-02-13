@@ -24,33 +24,37 @@ Docstrings will be a prevelant part of the code, will be included with most func
 
 For all functions we will use Google's docstring style. This includes having 1-2 sentences describing what the code does and also includes a section describing the arguments and a section describing the return values. If there are no argument/return values, there is no need to include those sections. You can optionally include a more detailed explanation after the initial description if you want to add more documentation. Triple double quotes will be used (as opposed to triple single quotes).
 
->Example: 
->    def function_with_types_in_docstring(param1, param2):
->        """
->        Example function with types documented in the docstring.
->
->        Args:
->            param1 (int): The first parameter.
->            param2 (str): The second parameter.
->
->        Returns:
->            bool: The return value. True for success, False otherwise.
->        """
->        <code>
+Example: 
+```
+    def function_with_types_in_docstring(param1, param2):
+        """
+        Example function with types documented in the docstring.
 
->Example:
->    def copy_mouse_position():
->        """
->        Copies the current mouse position on the screen to the console and your clipboard when the 'insert' key is pressed. 
->        This position can be used in clicking functions that will click a particular area. 
->        """
->        print('Running copy_mouse_position.py. Press the \'insert\' key to copy mouse position.')
->        print('Press ctrl + c while in the terminal window to exit.')
->        while True:
->            keyboard.wait('insert')
->            x, y = pyautogui.position()
->            pyperclip.copy(f'{str(x)}, {str(y)}')   
->            print(f'\'Insert\' key was pressed! Copied mouse position ({str(x)}, {str(y)}) to clipboard. Press ctrl + c while in the terminal window to exit. Waiting again...')
+        Args:
+            param1 (int): The first parameter.
+            param2 (str): The second parameter.
+
+        Returns:
+            bool: The return value. True for success, False otherwise.
+        """
+        <code
+```
+
+Example:
+```
+    def copy_mouse_position():
+        """
+        Copies the current mouse position on the screen to the console and your clipboard when the 'insert' key is pressed. 
+        This position can be used in clicking functions that will click a particular area. 
+        """
+        print('Running copy_mouse_position.py. Press the \'insert\' key to copy mouse position.')
+        print('Press ctrl + c while in the terminal window to exit.')
+        while True:
+            keyboard.wait('insert')
+            x, y = pyautogui.position()
+            pyperclip.copy(f'{str(x)}, {str(y)}')   
+            print(f'\'Insert\' key was pressed! Copied mouse position ({str(x)}, {str(y)}) to clipboard. Press ctrl + c while in the terminal window to exit. Waiting again...')
+```
 
 ## White Spacing
 Two empty lines above function declarations
