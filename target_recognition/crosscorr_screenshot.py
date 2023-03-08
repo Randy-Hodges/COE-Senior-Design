@@ -2,7 +2,6 @@ import cv2
 import os 
 
 # Clear existing screenshots
-
 folder_path = ('target_recognition/screenshots')
 test = os.listdir(folder_path)
 
