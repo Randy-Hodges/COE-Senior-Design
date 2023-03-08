@@ -99,3 +99,4 @@ while cap.isOpened():
 # Release the video file and close all windows
 cap.release()
 cv2.destroyAllWindows()
+
