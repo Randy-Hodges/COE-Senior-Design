@@ -4,11 +4,11 @@ import os
 # add code to CLEAR existing screenshots 
 
 # Load the template images in color
-template1 = cv2.imread('blue-target.png')
-template2 = cv2.imread('blue-white-target.png')
+template1 = cv2.imread('target_recognition/images/blue-target.png')
+template2 = cv2.imread('target_recognition/images/blue-white-target.png')
 
 # Open the video file
-cap = cv2.VideoCapture('1_2023-03-01_17-04-19.avi')
+cap = cv2.VideoCapture('target_recognition/video/1_2023-03-01_17-04-19.avi')
 # cap = cv2.VideoCapture('target_recognition/vid1.mp4')
 
 # Check if the video file was opened successfully
