@@ -16,9 +16,8 @@ def calculate_range(x, y, v_x, v_y, H):
     R = 0
     n = 0
     while n < N:
-        acc = q * (v_x ** 2) / m
-        a_x = -acc
-        a_y = g - acc
+        a_x = - q * (v_x ** 2) / m
+        a_y = g -  q * (v_y ** 2) / m
         v_x += a_x * h
         v_y += a_y * h
         x_temp = x + v_x * h + 0.5 * a_x * (h**2)
