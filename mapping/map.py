@@ -43,6 +43,3 @@ ax.scatter(x, y, color='red', marker='x')
 
 # Show the plot
 plt.show()
-
-# Show the plot
-plt.show()
