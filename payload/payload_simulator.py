@@ -8,7 +8,7 @@ target velocity & position, wind speed).
 
 """
 
-def payload_ground_hit_location(release_point_lat, release_point_long, target_lat, target_long, altitude, v_x, v_y, wind_speed, wind_direction):
+def payload_ground_hit_location(release_point_long, target_lat, target_long, altitude, v_x, v_y, wind_speed):
     # re-implement ballistic equation
     # include crosswinds as accelerations in x and y directions
     # wind direction is the angle of attack of the wind relative to the plane (so 0 degrees is head-on, 180 degrees is from the back, etc.)
@@ -35,10 +35,12 @@ def payload_ground_hit_location(release_point_lat, release_point_long, target_la
     t = 0
     R = 0
     n = 0
+    x = 0
+    y = 0
 
-    while n < N:
-        a_x = - q * (v_x ** 2) / m - q * (wind_speed*np.sin(wind_direction)) / m # first term is drag due to airplane speed, second term is drag due to crosswind
-        a_y = g -  q * (v_y ** 2) / m  - q * (wind_speed*np.cos(wind_direction)) / m
+    while True:
+        a_x = - q * (v_x ** 2) / m - q * (wind_speed ** 2) / m # first term is drag due to airplane speed, second term is drag due to headwind
+        a_y = g -  q * (v_y ** 2) / m 
         v_x += a_x * h
         v_y += a_y * h
         x_temp = x + v_x * h + 0.5 * a_x * (h**2)
@@ -47,14 +49,55 @@ def payload_ground_hit_location(release_point_lat, release_point_long, target_la
         y = y_temp
         t += h
     
-        if y == altitude:
+        if y >= altitude*.995:
             R = x
             break
 
         n +=1
 
-    # return target latitude - Rsintheta, target longitude - Rcostheta
+    
+    theta = np.arctan(target_long - release_point_long)/(target_lat - target_long)
+    ground_hit_long = R * np.cos(theta)
+    ground_hit_lat = R * np.sin(theta)
+
+    return ground_hit_lat, ground_hit_long
+
 if __name__ == "__main__":
-   lat, long = payload_ground_hit_location(args)
-   lat_error = target_lat - lat
-   long_error = target_long - long
+
+    long_errors = []
+    lat_errors = []
+    lats = []
+    longs = []
+    for i in range(10):
+        target_lat = 30
+        target_long = 29
+        altitude = 100 + 10*i
+        v_x = 15
+        v_y = 15
+        range = calculate_range(v_x, v_y, altitude)
+        print(range)
+        release_point_lat, release_point_long = calculate_release_point(range, target_long, target_lat, )
+        
+        
+        wind_speed = 0
+        wind_direction = 0     # angle in radians
+
+        lat, long = payload_ground_hit_location(release_point_lat, release_point_long, target_lat, target_long, altitude, v_x, v_y, wind_speed, wind_direction)
+        #print(long)
+        #print(lat)
+        #print("")
+        lat_error = target_lat - lat
+        long_error = target_long - long
+
+        long_errors.append(long_error)
+        lat_errors.append(lat_error)
+
+
+        
+    print(long_errors)
+    print(lat_errors)
+    plt.scatter(lat, long, color="blue")
+    plt.scatter(target_long, target_lat, color="red")
+    plt.show()
+        
+
