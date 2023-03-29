@@ -1,14 +1,20 @@
 import cv2
 import os 
 
-# add code to CLEAR existing screenshots 
+# Clear existing screenshots
+folder_path = ('target_recognition/screenshots')
+test = os.listdir(folder_path)
 
+for images in test:
+    if images.endswith(".jpg"):
+        os.remove(os.path.join(folder_path, images))
+        
 # Load the template images in color
-template1 = cv2.imread('blue-target.png')
-template2 = cv2.imread('blue-white-target.png')
+template1 = cv2.imread('target_recognition/images/blue-target.png')
+template2 = cv2.imread('target_recognition/images/blue-white-target.png')
 
 # Open the video file
-cap = cv2.VideoCapture('1_2023-03-01_17-04-19.avi')
+cap = cv2.VideoCapture('target_recognition/video/1_2023-03-01_17-04-19.avi')
 # cap = cv2.VideoCapture('target_recognition/vid1.mp4')
 
 # Check if the video file was opened successfully
@@ -53,10 +59,10 @@ while cap.isOpened():
         bottom_right = (top_left[0] + w, top_left[1] + h)
         cv2.rectangle(frame, top_left, bottom_right, (0, 0, 255), 2)
         
-        # holds screengrab of target
+        # holds screenshot of target
         cv2.imshow('frame', frame)
-        # saves screengrab
-        cv2.imwrite("targetrecognition/screenshots/target%d.jpg" % count, frame)
+        # saves screenshot
+        cv2.imwrite("target_recognition/screenshots/target%d.jpg" % count_all, frame)
         # update count
         count_all = count_all+1
 
@@ -75,10 +81,10 @@ while cap.isOpened():
         bottom_right = (top_left[0] + w, top_left[1] + h)
         cv2.rectangle(frame, top_left, bottom_right, (0, 255, 0), 2)
         
-        # holds screengrab of critical target
+        # holds screenshot of critical target
         cv2.imshow('frame', frame)
-        # saves screengrab
-        cv2.imwrite("targetrecognition/screenshots/critical%d.jpg" % count, frame)
+        # saves screenshot
+        cv2.imwrite("target_recognition/screenshots/critical%d.jpg" % count_critical, frame)
         # update count
         count_critical = count_critical+1
 
@@ -92,3 +98,4 @@ while cap.isOpened():
 # Release the video file and close all windows
 cap.release()
 cv2.destroyAllWindows()
+
