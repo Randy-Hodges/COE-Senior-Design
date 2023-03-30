@@ -35,7 +35,7 @@ cap = cv2.VideoCapture('target_recognition/video/1_2023-03-01_17-04-19.avi')
 
 # Create new csv file for pixel coordinates
 with open('target_recognition/pixel_coordinates.csv', 'w', newline='') as csvfile:
-            fieldnames = ['timestamp', 'identifier', 'top_left', 'bottom_right']
+            fieldnames = ['timestamp', 'identifier', 'top_left x', 'top_left y', 'bottom_right x', 'bottom_right y']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
 
@@ -89,7 +89,7 @@ while cap.isOpened():
         # write target pixel location to csv file, with image label identifier
         with open('target_recognition/pixel_coordinates.csv', 'a', newline='') as csvfile:
             writer_object = csv.writer(csvfile)
-            new_entry = [time.perf_counter(), 'target%d' % count_all, str(top_left), str(bottom_right)]
+            new_entry = [time.perf_counter(), 'target%d' % count_all, top_left[0], top_left[1], bottom_right[0], bottom_right[1]]
             writer_object.writerow(new_entry)
             csvfile.close()
             
@@ -119,7 +119,7 @@ while cap.isOpened():
         # write target pixel location to csv file, with image label identifier
         with open('target_recognition/pixel_coordinates.csv', 'a', newline='') as csvfile:
             writer_object = csv.writer(csvfile)
-            new_entry = [time.perf_counter(), 'critical%d' % count_critical, str(top_left), str(bottom_right)]
+            new_entry = [time.perf_counter(), 'critical%d' % count_critical, top_left[0], top_left[1], bottom_right[0], bottom_right[1]]
             writer_object.writerow(new_entry)
             csvfile.close()
         
