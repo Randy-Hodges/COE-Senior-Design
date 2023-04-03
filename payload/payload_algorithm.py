@@ -1,6 +1,6 @@
 import numpy as np
 
-def calculate_range(x, y, v_x, v_y, H):
+def calculate_range(v_x, v_y, H):
     rho = 1.225 # kg/m^3 for density of air at sea level
     C_d = 0.3 # just ballparking this, we should experimentally test it though
     A =  2 * np.pi * 0.05 * 0.3 # guessing 10cm in diameter, 30cm in height (forumla for surface area of computer)
@@ -15,7 +15,10 @@ def calculate_range(x, y, v_x, v_y, H):
     t = 0
     R = 0
     n = 0
-    while n < N:
+    x = 0
+    y = 0
+
+    while True:
         a_x = - q * (v_x ** 2) / m
         a_y = g -  q * (v_y ** 2) / m
         v_x += a_x * h
@@ -26,7 +29,7 @@ def calculate_range(x, y, v_x, v_y, H):
         y = y_temp
         t += h
     
-        if y == H:
+        if y >= H*.995:
             R = x
             break
 
@@ -34,14 +37,29 @@ def calculate_range(x, y, v_x, v_y, H):
     return R
     
 
-def calculate_release_point(R, T_long, T_lat, P_long, P_lat):
-    theta = np.arctan^((T_long - P_long)/(T_lat - P_lat))
+def calculate_release_point(R, T_long, T_lat, P_long):
+    theta = np.arctan((T_long - P_long)/(T_lat - T_long))
     release_point_lat = T_lat - R * np.sin(theta)
     release_point_long = T_long - R * np.cos(theta)
 
     return release_point_lat, release_point_long
 
+def release_payload(R, initial_long, initital_lat, v_x, v_y, target_long, target_lat):
+    # send plane along a trajectory determined by vx and vy
+    # continually update position, call it p_long and p_lat
+    # at each update, run calculate_release_point
+    # if p_long ~ release_point_long and p_lat ~ release_point_lat, release payload
 
+    
+    x = initial_long
+    y = initital_lat
+    h = 0.02 # timestep
+    for i in range(10000000):
+        x += v_x*h
+        y += v_y*h
+        release_point_lat, release_point_long = calculate_release_point(R, T_long, T_lat, x)
+        if (0.95*release_point_long <= x <= 1.05*release_point_long) and (0.95*release_point_lat <= y <= 1.05*release_point_lat):
+            return x,y
 
 """ We need to talk with mapping about generating the flight path to the targets. Since this assumes constant altitude and 
 aircraft velocity to calculate the release point along the path, we should really only start this program once we're somewhat close
@@ -62,7 +80,7 @@ if __name__ == "__main__":
     v_y = pixhawk.y_vel 
     H = pixhawk.altitude
 
-    R = calculate_range(x, y, v_x, v_y, H)
+    R = calculate_range(v_x, v_y, H)
 
     # placeholder
     T_long = mapping.target_long
