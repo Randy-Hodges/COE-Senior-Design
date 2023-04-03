@@ -1,4 +1,4 @@
-print "Start simulator (SITL)"
+print("Start simulator (SITL)")
 import dronekit_sitl
 sitl = dronekit_sitl.start_default()
 connection_string = sitl.connection_string()
@@ -11,7 +11,7 @@ print("Connecting to vehicle on: %s" % (connection_string,))
 vehicle = connect(connection_string, wait_ready=True)
 
 # Get some vehicle attributes (state)
-print "Vehicle attribute values:"
+print("Vehicle attribute values:")
 print(" Autopilot capabilities")
 print(" Global Location: %s" % vehicle.location.global_frame)
 print(" Global Location (relative altitude): %s" % vehicle.location.global_relative_frame)
