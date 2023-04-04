@@ -17,13 +17,13 @@ def payload_ground_hit_location(release_point_long, target_lat, target_long, alt
 
     # time delay effects (aircraft will be some distance ahead of our release point due to a trigger delay)
     time_delay = 1 # assume 1 second time delay
-    release_point_lat = v_y*time_delay + release_point_lat # y is latitude I think
+    # release_point_lat = v_y*time_delay + release_point_lat # y is latitude I think
     release_point_long = v_x * time_delay + release_point_long # x is longtidue I think
 
     # ballistic equation
     rho = 1.225 # kg/m^3 for density of air at sea level
     C_d = 0.3 # just ballparking this, we should experimentally test it though
-    A =  2 * np.pi * 0.05 * 0.3 # guessing 10cm in diameter, 30cm in height (forumla for surface area of computer)
+    A =  0.05 * 0.3 # guessing 10cm in diameter, 30cm in height (frontal surface area)
     m = 0.5 # roughly half a kilo in weight
     g = 9.8 # m/s^2
     
@@ -38,11 +38,22 @@ def payload_ground_hit_location(release_point_long, target_lat, target_long, alt
     x = 0
     y = 0
 
+    terminal_velocity = np.sqrt((2*m*g)/(rho * A * C_d))
+
     while True:
-        a_x = - q * (v_x ** 2) / m - q * (wind_speed ** 2) / m # first term is drag due to airplane speed, second term is drag due to headwind
+        #print("X position is: ", x, "Y position is: ", y)
+        print("X velocity is: ", v_x, "Y velocity is: ", v_y)
+
+        a_x = float(- q * (v_x ** 2) / m - q * (wind_speed ** 2) / m) # first term is drag due to airplane speed, second term is drag due to headwind
         a_y = g -  q * (v_y ** 2) / m 
-        v_x += a_x * h
-        v_y += a_y * h
+        if wind_speed > 0 and v_x < 0 and abs(v_x) >= wind_speed: # if there is a headwind and the payload's velocity in that direction is greater than the headwind, set velocity to headwind
+            v_x = wind_speed
+        else:
+            v_x += a_x * h
+        if v_y < terminal_velocity:
+            v_y += a_y * h
+        else:
+            v_y = terminal_velocity
         x_temp = x + v_x * h + 0.5 * a_x * (h**2)
         y_temp = y + v_y * h + 0.5 * a_y * (h**2)
         x = x_temp
@@ -69,20 +80,20 @@ if __name__ == "__main__":
     lats = []
     longs = []
     for i in range(10):
-        target_lat = 30
-        target_long = 29
+        target_long = 20
+        target_lat = 10
         altitude = 100 + 10*i
-        v_x = 15
-        v_y = 15
+        v_x = 10
+        v_y = 5
         range = calculate_range(v_x, v_y, altitude)
         print(range)
-        release_point_lat, release_point_long = calculate_release_point(range, target_long, target_lat, )
+        release_point_lat, release_point_long = calculate_release_point(range, target_long, target_lat, 0)
         
         
         wind_speed = 0
         wind_direction = 0     # angle in radians
 
-        lat, long = payload_ground_hit_location(release_point_lat, release_point_long, target_lat, target_long, altitude, v_x, v_y, wind_speed, wind_direction)
+        lat, long = payload_ground_hit_location(release_point_long, target_lat, target_long, altitude, v_x, v_y, wind_speed)
         #print(long)
         #print(lat)
         #print("")
@@ -91,13 +102,14 @@ if __name__ == "__main__":
 
         long_errors.append(long_error)
         lat_errors.append(lat_error)
+        lats.append(lat)
+        longs.append(long)
 
 
-        
-    print(long_errors)
     print(lat_errors)
-    plt.scatter(lat, long, color="blue")
+    print(long_errors)
+    plt.scatter(longs, lats, color="blue")
     plt.scatter(target_long, target_lat, color="red")
     plt.show()
-        
+
 
