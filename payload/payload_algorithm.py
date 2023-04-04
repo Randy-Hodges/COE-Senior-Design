@@ -1,9 +1,9 @@
 import numpy as np
 
-def calculate_range(v_x, v_y, H):
+def calculate_range(v_x, v_z, H):
     rho = 1.225 # kg/m^3 for density of air at sea level
     C_d = 0.3 # just ballparking this, we should experimentally test it though
-    A =  2 * np.pi * 0.05 * 0.3 # guessing 10cm in diameter, 30cm in height (forumla for surface area of computer)
+    A =  0.05 * 0.3 # guessing 10cm in diameter, 30cm in height
     m = 0.5 # roughly half a kilo in weight
     g = 9.8 # m/s^2
     
@@ -16,20 +16,25 @@ def calculate_range(v_x, v_y, H):
     R = 0
     n = 0
     x = 0
-    y = 0
+    z = 0
+
+    terminal_velocity = np.sqrt((2*m*g)/(rho * A * C_d))
 
     while True:
         a_x = - q * (v_x ** 2) / m
-        a_y = g -  q * (v_y ** 2) / m
+        a_z = g -  q * (v_z ** 2) / m
         v_x += a_x * h
-        v_y += a_y * h
+        if v_z < terminal_velocity:
+            v_z += a_z * h
+        else:
+            v_z = terminal_velocity
         x_temp = x + v_x * h + 0.5 * a_x * (h**2)
-        y_temp = y + v_y * h + 0.5 * a_y * (h**2)
+        z_temp = z + v_z * h + 0.5 * a_z * (h**2)
         x = x_temp
-        y = y_temp
+        z = z_temp
         t += h
     
-        if y >= H*.995:
+        if z >= H:
             R = x
             break
 
@@ -37,29 +42,48 @@ def calculate_range(v_x, v_y, H):
     return R
     
 
-def calculate_release_point(R, T_long, T_lat, P_long):
-    theta = np.arctan((T_long - P_long)/(T_lat - T_long))
-    release_point_lat = T_lat - R * np.sin(theta)
-    release_point_long = T_long - R * np.cos(theta)
+def calculate_release_point(R, target_lat, target_long, plane_lat, plane_long):
+    r = [target_lat - plane_lat, target_long - plane_long] # position vector from release point to target
+    theta = np.arctan2(r[1], r[0])
+    release_point_lat = target_lat - R * np.cos(theta)
+    release_point_long = target_long - R * np.sin(theta)
+
+    #theta = np.arctan((target_long - plane_long)/(target_lat - plane_lat))
+    #release_point_lat = target_lat - R * np.sin(theta)
+    #release_point_long = target_long - R * np.cos(theta)
+
+    print("RELEASE POINT LAT IS: ", release_point_lat)
+    print("RELEASE POINT LONG IS: ", release_point_long)
 
     return release_point_lat, release_point_long
 
-def release_payload(R, initial_long, initital_lat, v_x, v_y, target_long, target_lat):
+def release_payload(R, initial_lat, initial_long, v_x, v_y, target_lat, target_long):
     # send plane along a trajectory determined by vx and vy
     # continually update position, call it p_long and p_lat
     # at each update, run calculate_release_point
     # if p_long ~ release_point_long and p_lat ~ release_point_lat, release payload
 
     
-    x = initial_long
-    y = initital_lat
+    x = initial_lat
+    y = initial_long
     h = 0.02 # timestep
-    for i in range(10000000):
+    release_point_lat, release_point_long = calculate_release_point(R, target_lat, target_long, x, y)
+
+    for i in range(100000):
         x += v_x*h
         y += v_y*h
-        release_point_lat, release_point_long = calculate_release_point(R, T_long, T_lat, x)
-        if (0.95*release_point_long <= x <= 1.05*release_point_long) and (0.95*release_point_lat <= y <= 1.05*release_point_lat):
+        threshold = 0.1 # % error
+        #if i % 100 == 0:
+            #print("X IS: ", x)
+            #print("Y IS: ", y)
+            #print((1 - threshold)*release_point_lat, x, (1 + threshold)*release_point_lat)
+            #print((1-threshold)*release_point_long, y, (1+threshold)*release_point_long)
+        if ((1 - threshold)*release_point_lat <= x <= (1 + threshold)*release_point_lat) and ((1-threshold)*release_point_long <= y <= (1+threshold)*release_point_long):
+            print("released within threshold")
             return x,y
+        
+    return x,y
+        
 
 """ We need to talk with mapping about generating the flight path to the targets. Since this assumes constant altitude and 
 aircraft velocity to calculate the release point along the path, we should really only start this program once we're somewhat close
