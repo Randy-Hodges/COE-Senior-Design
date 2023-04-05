@@ -3,14 +3,21 @@
   
 import numpy as np
 import cv2
-from payload_algorithm import calculate_range, calculate_release_point, release_payload
+import os
+import csv
+from csv import writer
+import time
+import numpy as np
+import rasterio 
+from crosscorr_screenshot import target_recognition
 from map import mapping
-"""Need to import target recognition here"""
+from payload_algorithm import calculate_range, calculate_release_point, release_payload
 
   
 if __name__ == "__main__":
-    # target recognition function goes here
-    
+    # target recognition 
+    target_recognition()
+
     # mapping function
     target_lat, target_long = mapping()
 
