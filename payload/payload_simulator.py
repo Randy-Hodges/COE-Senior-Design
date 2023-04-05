@@ -1,6 +1,6 @@
 from payload_algorithm import calculate_range
 from payload_algorithm import calculate_release_point
-from payload_algorithm import release_payload
+from payload_algorithm import release_payload_simulator
 import numpy as np
 import matplotlib.pyplot as plt
 """ 
@@ -16,10 +16,7 @@ def payload_ground_hit_location(release_point_lat, release_point_long, target_la
     # include a slight time delay (i.e. release point lat & long are a bit behind the actual drop locations)
     # include streamer effects?
 
-    # time delay effects (aircraft will be some distance ahead of our release point due to a trigger delay)
-    time_delay = 1 # assume 1 second time delay
-    release_point = v_x * time_delay + release_point_long 
-
+    
     # ballistic equation
     rho = 1.225 # kg/m^3 for density of air at sea level
     C_d = 0.3 # just ballparking this, we should experimentally test it though
@@ -37,6 +34,10 @@ def payload_ground_hit_location(release_point_lat, release_point_long, target_la
     n = 0
     x = 0
     z = 0
+
+    # time delay effects (aircraft will be some distance ahead of our release point due to a trigger delay)
+    time_delay = 1 # assume 1 second time delay
+    x = v_x * time_delay 
 
     terminal_velocity = np.sqrt((2*m*g)/(rho * A * C_d))
 
@@ -86,24 +87,25 @@ if __name__ == "__main__":
     g_longs = [] # ground hit longitudes
     rp_lats = [] # release point latitudes
     rp_longs = [] # release point longitudes
-    for i in range(1):
-        target_lat = 1
+    for i in range(10):
+        target_lat = -1
         target_long = 20
         v_x = 0 # x velocity
         v_y = 2 # y velocity
         v_z = 0 # downwards velocity
         v = np.sqrt(v_x**2 + v_y**2) # x and y velocity, assuming plane is on straight path towards target
-        x = 1
+        x = -1
         y = 0
-        z = 100 + 10*i
-        range = calculate_range(v, v_z, z)
-        release_point_lat, release_point_long = release_payload(range, x, y, v_x, v_y, target_lat, target_long)
-        #release_point_lat = 0
-        #release_point_long = 16
+        z = 61 # altitude in meters, which is 200 feet
+        wind_speed = np.random.randint(low=0, high=10) # 10 m/s is 22 mph
+        #wind_speed = 0
+        #wind_direction = np.pi/4     # angle in radians
+        wind_direction = 0
+        range = calculate_range(v, v_z, z, wind_speed) 
+        release_point_lat, release_point_long = release_payload_simulator(range, x, y, v_x, v_y, target_lat, target_long)
         
         
-        wind_speed = 0
-        wind_direction = 0     # angle in radians
+        
 
         g_lat, g_long = payload_ground_hit_location(release_point_lat, release_point_long, target_lat, target_long, z, v, v_z, wind_speed) # ground hit location lat and long
         lat_error = target_lat - g_lat
