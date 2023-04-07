@@ -1,6 +1,6 @@
 import numpy as np
 
-def calculate_range(v_x, v_z, H, wind_speed):
+def calculate_range(v_x, v_z, H, wind_speed, time_delay):
     rho = 1.225 # kg/m^3 for density of air at sea level
     C_d = 0.3 # just ballparking this, we should experimentally test it though
     A =  0.05 * 0.3 # guessing 10cm in diameter, 30cm in height
@@ -18,7 +18,6 @@ def calculate_range(v_x, v_z, H, wind_speed):
     x = 0
     z = 0
 
-    time_delay = 1 # assume 1 second time delay
     x = v_x * time_delay 
 
     terminal_velocity = np.sqrt((2*m*g)/(rho * A * C_d))
@@ -81,7 +80,7 @@ def release_payload_simulator(R, initial_lat, initial_long, v_x, v_y, target_lat
     for i in range(100000):
         x += v_x*h
         y += v_y*h
-        threshold = 0.05     # % error
+        threshold = 0.02     # % error
         if i % 100 == 0:
             #print("X IS: ", x)
             #print("Y IS: ", y)
