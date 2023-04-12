@@ -1,6 +1,7 @@
+#!/usr/bin/env python
+
 from dronekit import connect, VehicleMode
-import time
-import os
+from pymavlink import mavutil
 import time
 import os
 import csv
@@ -40,13 +41,12 @@ with open('mission_callbacks/mission_callbacks.csv', 'w', newline='') as csvfile
     # may need to set 'wait_ready' to False
     
 # Specify connection string: UNCOMMENT THIS TO CONNECT TO PIXHAWK
-# connection_string = '/dev/ttyUSB0'
+connection_string = '/dev/ttyTHS1'
 
 if connection_string:
-    print('\nConnecting to aircraft on /dev/ttyUSB0 ...')
-    vehicle = connect(connection_string, wait_ready=True, baud=57600)
+    print('\nConnecting to aircraft on /dev/ttyTHS1 ...')
+    vehicle = connect(connection_string, wait_ready=False, baud=57600)
     print("\nSuccessfully connected to aircraft. Begin mission!")
-
 
 ## Start SIMULATION if no connection string specified ##
 if not connection_string:
@@ -60,7 +60,7 @@ if not connection_string:
     print("\nConnecting to vehicle on: %s" % connection_string)
     vehicle = connect(connection_string, wait_ready=True)
     vehicle.wait_ready('autopilot_version')
-    
+
 # Get some vehicle attributes (state)
 print("\nInitial vehicle attribute values:")
 print(" Global Location: %s" % vehicle.location.global_frame)
@@ -214,7 +214,6 @@ print("Add `gps_0` attribute callback/observer on `vehicle`")
 vehicle.add_attribute_listener('gps_0', gps_0_callback)
 print("Add `last_heartbeat` attribute callback/observer on `vehicle`")     
 vehicle.add_attribute_listener('last_heartbeat', last_heartbeat_callback)
-
 
 ## Define how long to observe callbacks for ##
 print("\n Wait 5s so callback invoked before observer removed")
