@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
-from dronekit import connect
-import time
-import os
+from dronekit import connect, VehicleMode, LocationGlobalRelative
+from pymavlink import mavutil
 import time
 import os
 import csv
@@ -42,12 +41,12 @@ with open('mission_callbacks/mission_callbacks.csv', 'w', newline='') as csvfile
     # may need to set 'wait_ready' to False
     
 # Specify connection string: UNCOMMENT THIS TO CONNECT TO PIXHAWK
-# connection_string = '/dev/ttyTHS1'
+connection_string = '/dev/ttyTHS1'
 
 if connection_string:
     print('\nConnecting to aircraft on /dev/ttyTHS1 ...')
-    vehicle = connect(connection_string, wait_ready=True, baud=57600)
-    print("\nSuccessfully connected to aircraft. Begin mission!")
+    vehicle = connect(connection_string, wait_ready=False, baud=57600)
+    print("\nSuccessfully connected to aircraft.")
 
 
 ## Start SIMULATION if no connection string specified ##
@@ -72,53 +71,64 @@ print(" Local Location: %s" % vehicle.location.local_frame)
 print(" Attitude: %s" % vehicle.attitude)
 print(" Velocity: %s" % vehicle.velocity)
 print(" GPS: %s" % vehicle.gps_0)
-print(" Wind Direction: %s" % vehicle.wind)
-print(" Wind Speed: %s" % vehicle.wind)
+# print(" Wind Direction: %s" % vehicle.wind)
+# print(" Wind Speed: %s" % vehicle.wind)
 print(" Last Heartbeat: %s" % vehicle.last_heartbeat)
 print(" Battery: %s" % vehicle.battery)
-
 
 # Function to arm and then takeoff to a user specified altitude
 def arm_and_takeoff(aTargetAltitude):
 
-    print ("Basic pre-arm checks")
+    print("\nBasic pre-arm checks")
     # Don't let the user try to arm until autopilot is ready
-    while not vehicle.is_armable:
-        print (" Waiting for vehicle to initialise...")
-        time.sleep(1)
+    #while not vehicle.is_armable:
+    #    print (" Waiting for vehicle to initialise...")
+    #    time.sleep(1)
         
-    print ("Arming motors")
+    print("\nArming motors")
     # Copter should arm in GUIDED mode
-    vehicle.mode    = VehicleMode("GUIDED")
-    vehicle.armed   = True
+    vehicle.mode = VehicleMode("GUIDED")
+    vehicle.armed = True
 
-    while not vehicle.armed:
-        print (" Waiting for arming...")
-        time.sleep(1)
+    # while not vehicle.armed:
+    #    print (" Waiting for arming...")
+    #    time.sleep(1)
 
-    print ("Taking off!")
+    print ("\nTaking off!")
     vehicle.simple_takeoff(aTargetAltitude) # Take off to target altitude
 
+    print("\nMode: %s" % vehicle.mode.name)
+    print("Armed: %s" % vehicle.armed)
+    print("Is Armable?: %s" % vehicle.is_armable)
+    print("")
+
   # Check that vehicle has reached takeoff altitude
-    while True:
-        print (" Altitude: ", vehicle.location.global_relative_frame.alt) 
+  #  while True:
+  #      print (" Altitude: ", vehicle.location.global_relative_frame.alt) 
         
         #Break and return from function just below target altitude.        
-        if vehicle.location.global_relative_frame.alt>=aTargetAltitude*0.95: 
-            print("Reached target altitude")
-            break
-        time.sleep(1)
+  #      if vehicle.location.global_relative_frame.alt>=aTargetAltitude*0.95: 
+  #          print("Reached target altitude")
+  #          break
+  #      time.sleep(1)
 
 # Initialize the takeoff sequence to 20m
 arm_and_takeoff(20)
 
-print("Take off complete")
+print("\nTake off complete")
+
+# Flying to a point - simple_goto
+
+# set the default ravel speed
+vehicle.airspeed=3
+point1 = LocationGlobalRelative(-35.363244, 149.166801, 20)
+vehicle.simple_goto(point1)
 
 # Hover for 10 seconds
 time.sleep(10)
 
 print("Now let's land")
-vehicle.mode = VehicleMode("LAND")
+vehicle.mode = VehicleMode("GUIDED")
 
 # Close vehicle object
 vehicle.close()
