@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 3
+names: ['Blank Target', 'Frown', 'Smile']
+
+roboflow:
+  workspace: senior-design-znne8
+  project: senior-design-target-detection
+  version: 2
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/senior-design-znne8/senior-design-target-detection/dataset/2

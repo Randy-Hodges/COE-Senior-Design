@@ -13,7 +13,7 @@ This outputs labeled images as described in the terminal output following a succ
 
 The example weight file is yolov5s.pt
 
-Our weights file (this will be updated with more training) is ourwieghts_1.pt
+Our weights file (this will be updated with more training) is our_weights_1.pt
 
 The example image folder is data/images
 
