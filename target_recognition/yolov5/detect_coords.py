@@ -5,6 +5,8 @@ import sys
 from pathlib import Path
 
 import torch
+import csv
+import numpy as np
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # YOLOv5 root directory
@@ -20,6 +22,7 @@ from utils.plots import Annotator, colors, save_one_box
 from utils.torch_utils import select_device, smart_inference_mode
 
 def run(
+        csv_name = 'output.csv',
         weights=ROOT / 'our_weights_1.pt',  # model path or triton URL
         source=ROOT / 'data/test_yolov5_1',  # file/dir/URL/glob/screen/0(webcam)
         data=ROOT / 'data/our_data_1.yaml',  # dataset.yaml path
@@ -29,7 +32,7 @@ def run(
         max_det=1000,  # maximum detections per image
         device='',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
         view_img=False,  # show results
-        save_txt=True,  # save results to *.txt
+        save_txt=False,  # save results to *.txt
         save_conf=False,  # save confidences in --save-txt labels
         save_crop=False,  # save cropped prediction boxes
         nosave=False,  # do not save images/videos
@@ -88,6 +91,9 @@ def run(
         dataset = LoadImages(source, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
     vid_path, vid_writer = [None] * bs, [None] * bs
 
+
+    coordinate_arr = np.array([["img number","object class","x1","y1","x2","y2"]])
+
     # Run inference
     model.warmup(imgsz=(1 if pt or model.triton else bs, 3, *imgsz))  # warmup
     seen, windows, dt = 0, [], (Profile(), Profile(), Profile())
@@ -140,14 +146,30 @@ def run(
                 
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
-                    if save_txt:  # Write to file
-                        xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
-                        line = (cls, *xywh, conf) if save_conf else (cls, *xywh)  # label format
-                        print("text path: "+ str(f'{txt_path}.txt'))
+                    xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
+                    line = (cls, *xywh, conf) if save_conf else (cls, *xywh)  # label format
+                    #print("line type: "+ str(type(line)))
+                    
+                    
+                    print("p.name: "+ str(p.name))
+                    
+                    line_arr = np.asanyarray(line)
+                    line_arr = [np.concatenate(([str(p.name)],line_arr), axis = 0)]
+                    
+                    
+                    print("line arr: "+ str(line_arr))
+                    
+                    coordinate_arr = np.concatenate((coordinate_arr,line_arr), axis = 0)
+                    
+                    #if save_txt:  # Write to file
                         
-                        with open(f'{txt_path}.txt', 'a') as f:
-                            f.write(('%g ' * len(line)).rstrip() % line + '\n')
-                            print(('%g ' * len(line)).rstrip() % line + '\n')
+                    #print("text path: "+ str(f'{txt_path}.txt'))
+                    """
+                    with open(f'{txt_path}.txt', 'a') as f:
+                        #f.write(('%g ' * len(line)).rstrip() % line + '\n')
+                        print(('%g ' * len(line)).rstrip() % line + '\n')
+                    """
+                        
                         
                     """
                     if save_img or save_crop or view_img:  # Add bbox to image
@@ -193,8 +215,15 @@ def run(
                     vid_writer[i].write(im0)
             """
             
+        
+        
+            
         # Print time (inference-only)
         LOGGER.info(f"{s}{'' if len(det) else '(no detections), '}{dt[1].dt * 1E3:.1f}ms")
+
+    with open(csv_name,"w+") as my_csv:
+        csvWriter = csv.writer(my_csv,delimiter=',')
+        csvWriter.writerows(coordinate_arr)
 
     # Print results
     t = tuple(x.t / seen * 1E3 for x in dt)  # speeds per image
@@ -217,7 +246,7 @@ def parse_opt():
     parser.add_argument('--max-det', type=int, default=1000, help='maximum detections per image')
     parser.add_argument('--device', default='', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
     parser.add_argument('--view-img', action='store_true', help='show results')
-    parser.add_argument('--save-txt', default=True, action='store_true', help='save results to *.txt')
+    parser.add_argument('--save-txt', default=False, action='store_true', help='save results to *.txt')
     parser.add_argument('--save-conf', action='store_true', help='save confidences in --save-txt labels')
     parser.add_argument('--save-crop', action='store_true', help='save cropped prediction boxes')
     parser.add_argument('--nosave', action='store_true', help='do not save images/videos')
@@ -235,6 +264,9 @@ def parse_opt():
     parser.add_argument('--half', action='store_true', help='use FP16 half-precision inference')
     parser.add_argument('--dnn', action='store_true', help='use OpenCV DNN for ONNX inference')
     parser.add_argument('--vid-stride', type=int, default=1, help='video frame-rate stride')
+    
+    parser.add_argument('--csv_name', type=str, default='output.csv', help='output csv file path')
+    
     opt = parser.parse_args()
     opt.imgsz *= 2 if len(opt.imgsz) == 1 else 1  # expand
     print_args(vars(opt))
