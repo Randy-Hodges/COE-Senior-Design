@@ -1,5 +1,13 @@
-# Python code for Multiple Color Detection
-  
+#!/usr/bin/python3 
+#
+#
+# Desc: Runs all of the different teams code together to recognize targets, map out plane paths, map out the targets
+#       and eventually time the payload drop on critical targets. (further implementation details go here)
+#
+# Warnings:
+#
+# TODO: 
+#  
   
 import numpy as np
 import cv2
@@ -13,6 +21,8 @@ from crosscorr_screenshot import target_recognition
 from map import mapping
 from payload_algorithm import calculate_range, calculate_release_point, release_payload
 import pandas as pd
+
+# ---------------------------------------
 
   
 if __name__ == "__main__":

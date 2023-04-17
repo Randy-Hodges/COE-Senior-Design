@@ -1,8 +1,20 @@
+#!/usr/bin/python3 
+#
+#
+# Desc: Uses screenshots of a video, recognizes targets in the frames provided and outputs the locations of those targets in a csv file.
+#
+# Warnings: Currently clears out all jpg and csv files in the target_folder. Prob not best but it's what we're working with for now 
+#
+# TODO: 
+#
+
+
 import cv2
 import os
 import csv
 from csv import writer
 import time
+# ---------------------------------------
 
 def target_recognition():
     # Start timer
