@@ -150,9 +150,16 @@ def run(
                     line = (cls, *xywh, conf) if save_conf else (cls, *xywh)  # label format
                     #print("line type: "+ str(type(line)))
                     
+                    #print("xyxy: "+str(xyxy))
                     
-                    line_arr = np.asanyarray(line)
-                    line_arr = [np.concatenate(([str(p.name)],line_arr), axis = 0)]
+                    x1 = int(xyxy[0].item())
+                    y1 = int(xyxy[1].item())
+                    x2 = int(xyxy[2].item())
+                    y2 = int(xyxy[3].item())
+                    #print("coords: "+str([x1, y1, x2, y2]))
+                    
+                    line_arr = [x1, y1, x2, y2]
+                    line_arr = [np.concatenate(([str(p.name)],[cls],line_arr), axis = 0)]
                     
                     
                     coordinate_arr = np.concatenate((coordinate_arr,line_arr), axis = 0)
