@@ -92,7 +92,7 @@ def run(
     vid_path, vid_writer = [None] * bs, [None] * bs
 
 
-    coordinate_arr = np.array([["img number","object class","x1","y1","x2","y2"]])
+    coordinate_arr = np.array([["img name","object class","x1","y1","x2","y2"]])
 
     # Run inference
     model.warmup(imgsz=(1 if pt or model.triton else bs, 3, *imgsz))  # warmup
