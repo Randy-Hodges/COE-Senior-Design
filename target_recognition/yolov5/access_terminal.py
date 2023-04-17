@@ -12,7 +12,7 @@ def classify_images(weights_file,image_folder , csv_file ):
     yolo_query = "python3 detect_coords.py --weights " +weights_file  + "  --img 640 --conf 0.25 --source "+image_folder+ " --csv_name "+csv_file
     os.system(yolo_query)
     
-classify_images("our_weights_1.pt","data/test_yolov5_1", "output_test.csv")
+classify_images("our_weights_1.pt","data/test_yolov5_1", "output_testington.csv")
 
 
 
