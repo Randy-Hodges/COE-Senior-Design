@@ -1,0 +1,11 @@
+[Unit]
+Description=Service that runs our code on startup
+After=multi-user.target
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/usr/bin/python3 /usr/local/mytest.py
+
+[Install]
+WantedBy=multi-user.target
